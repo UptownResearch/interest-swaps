@@ -1,0 +1,25 @@
+{
+  "name": "interest-swaps",
+  "version": "1.0.0",
+  "description": "Built from truffle react box (https://github.com/truffle-box/react-box).",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UptownResearch/interest-swaps.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UptownResearch/interest-swaps/issues"
+  },
+  "homepage": "https://github.com/UptownResearch/interest-swaps#readme",
+  "dependencies": {
+    "truffle-assertions": "^0.9.1"
+  }
+}
