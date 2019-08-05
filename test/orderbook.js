@@ -49,8 +49,8 @@ contract("OrderBook", accounts => {
 
   it("...should match orders up to limit", async() => {
     const OrderBookInstance = await OrderBook.deployed();
-    // OrderBook.take(uint amountDesired, uint levellimit) 
+    // OrderBook.take(uint amountDesired, uint levellimit)
     await OrderBookInstance.take( { from: accounts[1] });
-  })
+  });
 
 });

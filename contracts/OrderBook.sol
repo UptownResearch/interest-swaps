@@ -13,9 +13,16 @@ contract OrderBook {
         uint indexLocation;
     }
 
+    struct filledOrder {
+        address floater;
+        address fixer;
+        uint amount;
+    }
+
     mapping (uint=>Order[]) book;
     mapping (address=>userOrders[]) openOrders;
     uint levels;
+    filledOrder[]  filledOrders;
 
     constructor(uint _levels) public {
         levels = _levels;
@@ -80,7 +87,50 @@ contract OrderBook {
     }
 
     function take(uint amountDesired, uint levellimit ) public {
-      
+      uint amountremaining = amountDesired;
+      uint level = 1;
+      filledOrder[] memory allFilled;
+      while (amountremaining > 0 && level <= levellimit) {
+
+        if (level > levels){
+          break;
+        }
+
+        if (book[level].length == 0){
+          level++;
+          continue;
+        }
+
+        if (book[level][0].amount < amountremaining) {
+          //fill entire order
+          Order storage toFill = book[level].pop();
+
+          filledOrder storage filled = filledOrder(
+            toFill.floater,
+            msg.sender,
+            toFill.amount
+            );
+
+          amountremaining -= toFill.amount;
+          filledOrders.push(filled);
+          allFilled.push(filled);
+
+        } else {
+          //fill part of order
+          book[level][0].amount -= amountremaining;
+
+          filledOrder storage filled = filledOrder(
+            book[level][0].floater,
+            msg.sender,
+            amountremaining
+            );
+          amountremaining = 0;
+          filledOrders.push(filled);
+          allFilled.push(filled);
+          break;
+        }
+      }
+      return allFilled;
     }
 
 
