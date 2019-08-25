@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/UptownResearch/interest-swaps#readme",
   "dependencies": {
-    "truffle-assertions": "^0.9.1"
+    "dotenv": "^8.0.0",
+    "truffle-assertions": "^0.9.1",
+    "truffle-hdwallet-provider": "^1.0.15"
   }
 }

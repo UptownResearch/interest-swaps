@@ -14,7 +14,6 @@ contract("OrderBook", accounts => {
     const order = returnedItems[0];
     assert.equal(order['amount'], orderSize)
     assert.equal(order['floater'], accounts[0])
-    //assert.equal(storedData, 89, "The value 89 was not stored.");
   });
 
   it("...should delete an order.", async () => {
@@ -50,7 +49,45 @@ contract("OrderBook", accounts => {
   it("...should match orders up to limit", async() => {
     const OrderBookInstance = await OrderBook.deployed();
     // OrderBook.take(uint amountDesired, uint levellimit)
-    await OrderBookInstance.take( { from: accounts[1] });
+    //await OrderBookInstance.take( { from: accounts[1] });
   });
+
+  it("...should create an order queue of length 1", async() => {
+    const OrderBookInstance = await OrderBook.deployed();
+    await OrderBookInstance.pushOrder(1, 10);
+    //console.log(await OrderBookInstance.viewFrontBack());
+    //console.log(await OrderBookInstance.tryPeek());
+    assert.equal(await OrderBookInstance.getLength(), 1);
+
+  });
+
+  it("...should permit removal from the queue", async() =>{
+    const OrderBookInstance = await OrderBook.deployed();
+    // REMEMBER OrderBookInstance already has STATE!
+    await OrderBookInstance.pushOrder(1, 20);
+    //First we call to see the result (without changing state!)
+    //console.log(await OrderBookInstance.removeFirstOrder.call());
+    //Next we call to change the state
+    await OrderBookInstance.removeFirstOrder();
+    assert.equal(await OrderBookInstance.getLength(), 1);
+  });
+
+  it("...should do a wierd", async() =>{
+    const OrderBookInstance = await OrderBook.deployed();
+    // REMEMBER OrderBookInstance already has STATE!
+    await OrderBookInstance.pushOrder(1, 30);
+    //First we call to see the result (without changing state!)
+    //console.log(await OrderBookInstance.tryPeek());
+    console.log(await OrderBookInstance.removeFirstOrder.call());
+    //Next we call to change the state
+    //console.log(await OrderBookInstance.tryPeek());
+    await OrderBookInstance.removeFirstOrder();
+    //console.log(await OrderBookInstance.takeALook());
+    console.log(await OrderBookInstance.doAWeird.call());
+
+    assert.equal(await OrderBookInstance.getLength(), 1);
+  })
+
+
 
 });

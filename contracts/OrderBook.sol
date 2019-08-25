@@ -19,14 +19,115 @@ contract OrderBook {
         uint amount;
     }
 
+    // Queue inspired by: https://github.com/chriseth/solidity-examples/blob/master/queue.sol
+    struct OrderQueue {
+      Order[] data;
+      uint front;
+      uint back;
+    }
+
+
     mapping (uint=>Order[]) book;
     mapping (address=>userOrders[]) openOrders;
     uint levels;
     filledOrder[]  filledOrders;
+    OrderQueue _test;
+    Order viewableOrder;
+    Order weird;
 
     constructor(uint _levels) public {
         levels = _levels;
     }
+
+    //Queue functions
+
+    /// the number of elements stored in the queue.
+    function length(OrderQueue storage q) view internal returns (uint) {
+      return q.back - q.front;
+    }
+
+    /// the number of elements this queue can hold
+    function capacity(OrderQueue storage q) view internal returns (uint) {
+        return q.data.length - 1;
+    }
+
+    /// push a new element to the back of the queue
+    function push(OrderQueue storage q, Order memory data) internal
+    {
+        //if ((q.back + 1) % q.data.length == q.front)
+        //    return; // throw;
+        //q.data[q.back] = data;
+        //q.back = (q.back + 1) % q.data.length;
+        q.data.length++;
+        q.data[q.back] = data;
+        q.back++;
+
+    }
+
+    /// @dev remove and return the element at the front of the queue
+    function pop(OrderQueue storage q) internal returns (Order storage r)
+    {
+        //if (q.back == q.front)
+        //    return; // throw;
+        //r = q.data[q.front];
+        //delete q.data[q.front];
+        //q.front = (q.front + 1) % q.data.length;
+        viewableOrder = q.data[q.front];
+        r = q.data[q.front];
+        delete q.data[q.front];
+        q.front++;
+    }
+
+    function pop2(OrderQueue storage q) internal returns (Order memory r)
+    {
+        r = q.data[q.front];
+        delete q.data[q.front];
+        q.front++;
+    }
+
+
+
+    ////////////////////////////////////////
+
+    // External Users of Queue
+
+    function pushOrder(uint addLevel, uint addAmount) public {
+      Order memory newOrder = Order(addAmount, msg.sender);
+      push(_test, newOrder);
+    }
+
+
+    function getLength() view public returns (uint) {
+      return length(_test);
+    }
+
+    function removeFirstOrder() public returns (Order memory r){
+      //r = pop(_test);
+      //return (r.amount, r.floater);
+      return pop2(_test);
+    }
+
+    function viewFrontBack() public view returns (uint, uint) {
+      return (_test.back, _test.front);
+    }
+
+    function tryPeek() public view returns (Order memory r)
+    {
+      r = _test.data[_test.front];
+    }
+
+    function takeALook() public view returns (Order memory r)
+    {
+      r = viewableOrder;
+    }
+
+    function doAWeird() public returns (Order memory r)
+    {
+      weird = pop2(_test);
+      r = weird;
+    }
+
+    ///////////////
 
     function addOrder(uint addLevel, uint addAmount) public {
         require(addLevel < levels && addLevel > 0);
@@ -86,10 +187,10 @@ contract OrderBook {
         }
     }
 
+    /*********
     function take(uint amountDesired, uint levellimit ) public {
       uint amountremaining = amountDesired;
       uint level = 1;
-      filledOrder[] memory allFilled;
       while (amountremaining > 0 && level <= levellimit) {
 
         if (level > levels){
@@ -103,9 +204,10 @@ contract OrderBook {
 
         if (book[level][0].amount < amountremaining) {
           //fill entire order
-          Order storage toFill = book[level].pop();
+          Order[] storage book_level = book[level];
+          Order storage toFill = book_level.pop();
 
-          filledOrder storage filled = filledOrder(
+          filledOrder memory filled =  filledOrder(
             toFill.floater,
             msg.sender,
             toFill.amount
@@ -113,26 +215,23 @@ contract OrderBook {
 
           amountremaining -= toFill.amount;
           filledOrders.push(filled);
-          allFilled.push(filled);
 
         } else {
           //fill part of order
           book[level][0].amount -= amountremaining;
 
-          filledOrder storage filled = filledOrder(
+          filledOrder memory filled = filledOrder(
             book[level][0].floater,
             msg.sender,
             amountremaining
             );
           amountremaining = 0;
           filledOrders.push(filled);
-          allFilled.push(filled);
           break;
         }
       }
-      return allFilled;
     }
-
+    *****/
 
 
 }
