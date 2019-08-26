@@ -78,12 +78,12 @@ contract("OrderBook", accounts => {
     await OrderBookInstance.pushOrder(1, 30);
     //First we call to see the result (without changing state!)
     //console.log(await OrderBookInstance.tryPeek());
-    console.log(await OrderBookInstance.removeFirstOrder.call());
+    //console.log(await OrderBookInstance.removeFirstOrder.call());
     //Next we call to change the state
     //console.log(await OrderBookInstance.tryPeek());
     await OrderBookInstance.removeFirstOrder();
     //console.log(await OrderBookInstance.takeALook());
-    console.log(await OrderBookInstance.doAWeird.call());
+    //console.log(await OrderBookInstance.doAWeird.call());
 
     assert.equal(await OrderBookInstance.getLength(), 1);
   })

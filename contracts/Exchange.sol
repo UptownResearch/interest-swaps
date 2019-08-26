@@ -116,6 +116,13 @@ contract Exchange {
       return levelLength[level];
   }
 
+  function getUserOrder(uint index) public view returns (Order memory r){
+      require(openOrders[msg.sender].length > index);
+      userOrders memory orderToGet = openOrders[msg.sender][index];
+      r = book[orderToGet.bookLevel].data[orderToGet.indexLocation];
+  }
+
+
   ////////////////////////////////////////
   // add and remove orders
 
