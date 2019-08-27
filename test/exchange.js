@@ -52,4 +52,14 @@ contract("Exchange", accounts => {
     //assert.equal(orderFromBook.floater, 0);
   });
 
+  it("...should not permit orders at level 0", async() => {
+  const ExchangeInstance = await Exchange.deployed();
+  await truffleAssert.reverts(ExchangeInstance.addOrder(0, 10, { from: accounts[0] }));
+
+
+
+
+});
+
+
 });

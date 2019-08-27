@@ -35,9 +35,11 @@ contract Exchange {
   mapping (uint=>uint) levelLength;
   uint levels;
   filledOrder[]  filledOrders;
+  uint startLevel;
 
   constructor(uint _levels) public {
       levels = _levels;
+      startLevel = levels;
   }
 
   //Queue functions
@@ -77,6 +79,10 @@ contract Exchange {
       r = q.data[q.front];
       delete q.data[q.front];
       q.front++;
+  }
+
+  function isEmpty(OrderQueue storage q) internal returns (bool){
+    return q.front == q.back;
   }
 
   function pop2(OrderQueue storage q) internal returns (Order memory r)
@@ -139,6 +145,9 @@ contract Exchange {
       openOrders[msg.sender].push(pointer);
       levelLength[addLevel]++;
       r = pointer;
+      if (startLevel > addLevel){
+        startLevel = addLevel;
+      }
   }
 
 
@@ -151,6 +160,50 @@ contract Exchange {
       delete openOrders[msg.sender][index];
       levelLength[orderToRemove.bookLevel]--;
   }
+
+
+  function take(uint amountDesired, uint levellimit ) public {
+    uint amountremaining = amountDesired;
+    uint level = startLevel;
+
+    require(levellimit <= levels);
+    while (amountremaining > 0 && level <= levellimit) {
+
+      if (isEmpty(book[level])){
+        level++;
+        continue;
+      }
+
+      if (Peek(book[level]).amount < amountremaining) {
+        //fill entire order
+        Order memory toFill = pop2(book[level]);
+
+        filledOrder memory filled =  filledOrder(
+          toFill.floater,
+          msg.sender,
+          toFill.amount
+          );
+
+        amountremaining -= toFill.amount;
+        filledOrders.push(filled);
+
+      } else {
+        //fill part of order
+        book[level].data[book[level].front].amount -= amountremaining;
+
+        filledOrder memory filled = filledOrder(
+          book[level].data[book[level].front].floater,
+          msg.sender,
+          amountremaining
+          );
+        amountremaining = 0;
+        filledOrders.push(filled);
+        break;
+      }
+    }
+  }
+
+
 
 
   ////// test functions
