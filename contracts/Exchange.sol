@@ -123,9 +123,13 @@ contract Exchange {
   }
 
   function getUserOrder(uint index) public view returns (Order memory r){
-      require(openOrders[msg.sender].length > index);
+      //require(openOrders[msg.sender].length > index);
       userOrders memory orderToGet = openOrders[msg.sender][index];
       r = book[orderToGet.bookLevel].data[orderToGet.indexLocation];
+  }
+
+  function getFilledOrders() public view returns (filledOrder[] memory r) {
+    r = filledOrders;
   }
 
 
@@ -159,6 +163,19 @@ contract Exchange {
       //remove order from open orders
       delete openOrders[msg.sender][index];
       levelLength[orderToRemove.bookLevel]--;
+  }
+
+
+  function fillOrderFromFront(uint level) public returns (filledOrder memory r){
+    Order memory toFill = pop2(book[level]);
+
+    r =  filledOrder(
+      toFill.floater,
+      msg.sender,
+      toFill.amount
+      );
+
+    filledOrders.push(r);
   }
 
 

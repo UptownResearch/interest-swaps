@@ -45,21 +45,30 @@ contract("Exchange", accounts => {
     assert.equal(orders.data.length, 4);
 
     await ExchangeInstance.removeOrder(2);
-    //const orderFromBook = await ExchangeInstance.getUserOrder.call(2);
+    const orderFromBook = await ExchangeInstance.getUserOrder.call(2);
     //console.log(orderFromBook);
     ExchangeInstance.getLevel.call(1).then( (result) => {console.log("Result", result.data)})
-    //assert.equal(orderFromBook.amount, 0);
-    //assert.equal(orderFromBook.floater, 0);
+    assert.equal(orderFromBook.amount, 0);
+    assert.equal(orderFromBook.floater, 0);
   });
 
   it("...should not permit orders at level 0", async() => {
-  const ExchangeInstance = await Exchange.deployed();
-  await truffleAssert.reverts(ExchangeInstance.addOrder(0, 10, { from: accounts[0] }));
+    const ExchangeInstance = await Exchange.deployed();
+    await truffleAssert.reverts(ExchangeInstance.addOrder(0, 10, { from: accounts[0] }));
+  });
 
+  it("...should permit taking from the front of orderbook", async() => {
+    const ExchangeInstance = await Exchange.deployed();
+    console.log(await ExchangeInstance.fillOrderFromFront.call(1));
+    //ExchangeInstance.getFilledOrders.call().then( (result) => {console.log("Filled Orders:", result.data)})
+  });
 
+  it("...should permit taking from the orderbook", async() => {
+    const ExchangeInstance = await Exchange.deployed();
+    await ExchangeInstance.take(10, 3,{ from: accounts[1] });
+    //ExchangeInstance.getFilledOrders.call().then( (result) => {console.log("Filled Orders:", result.data)})
+  });
 
-
-});
 
 
 });
